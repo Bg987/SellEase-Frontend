@@ -44,6 +44,7 @@ const Buy = () => {
             try {
                 const response = await BuyItem();
                 if (response.data.success) {
+                    console.log(response);
                     setHistory(response.data.items);
                     setFilteredHistory(response.data.items);
                 } else {

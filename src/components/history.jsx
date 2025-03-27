@@ -33,7 +33,6 @@ const History = () => {
         const fetchHistory = async () => {
             try {
                 const response = await historyFetch();
-                console.log(response);
                 if (response.data.success) {
                     setHistory(response.data.items);
                     setFilteredHistory(response.data.items);
