@@ -21,7 +21,6 @@ const Dashboard = () => {
                 console.error("Error fetching unread messages:", error);
             }
         };
-
         fetchUnreadMessages();
     }, []);
 
