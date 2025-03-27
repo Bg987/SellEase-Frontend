@@ -193,7 +193,7 @@ const Buy = () => {
                     filteredHistory.map((item) => (
                         <Grid item xs={12} sm={6} md={4} key={item.sellId}>
                             <Card sx={{ height: "100%" }}>
-                                {item.imageUrls?.length > 0 ? (
+                                {item.images?.length > 0 ? (
                                     <CardMedia
                                         component="img"
                                         height="180"
