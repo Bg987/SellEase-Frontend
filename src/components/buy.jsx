@@ -197,7 +197,7 @@ const Buy = () => {
                                     <CardMedia
                                         component="img"
                                         height="180"
-                                        image={item.imageUrls[0]} // First image
+                                        image={item.images[0]} // First image
                                         alt={item.itemName}
                                         sx={{ objectFit: "cover" }}
                                     />
