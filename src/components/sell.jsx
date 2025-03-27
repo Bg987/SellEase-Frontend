@@ -1,14 +1,16 @@
-import React, { useState,useEffect } from "react";
-import { TextField, Button, MenuItem, Container, Typography, Box, Card } from "@mui/material";
-import { sell,check } from "../services/api"; // Ensure this API function is correctly implemented
+import React, { useState, useEffect } from "react";
+import { TextField, Button, MenuItem, Container, Typography, Box, Card, CircularProgress } from "@mui/material";
+import { sell } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { useGlobalState } from "./GS";
+
 const categories = ["Automobiles", "Electronics", "Home Appliances"];
 
 const Sell = () => {
     const navigate = useNavigate();
     const { isLoggedIn, dologout } = useGlobalState();
-     const [formData, setFormData] = useState({
+    const [loading, setLoading] = useState(false); // Loading state
+    const [formData, setFormData] = useState({
         itemName: "",
         category: "",
         sellPrice: "",
@@ -16,23 +18,23 @@ const Sell = () => {
         city: "",
         images: [],
     });
-    useEffect(()=>{
+
+    useEffect(() => {
         const cityName = localStorage.getItem("City");
-        if(cityName){
-            setFormData({...formData,city : cityName});
+        if (cityName) {
+            setFormData((prevData) => ({ ...prevData, city: cityName }));
         }
-    },[]);
+    }, []);
+
     const [imagePreviews, setImagePreviews] = useState([]);
 
-    // Handle text input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    // Handle file selection for image uploads
     const handleFileChange = (e) => {
-        const files = Array.from(e.target.files); // Convert FileList to an array
+        const files = Array.from(e.target.files);
 
         if (files.length > 5) {
             alert("You can upload up to 5 images only.");
@@ -41,17 +43,16 @@ const Sell = () => {
 
         setFormData((prevData) => ({
             ...prevData,
-            images: files, // Store the File objects
+            images: files,
         }));
 
-        // Generate image previews
         const previews = files.map((file) => URL.createObjectURL(file));
         setImagePreviews(previews);
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true); // Start loading
 
         try {
             const data = new FormData();
@@ -61,21 +62,18 @@ const Sell = () => {
             data.append("description", formData.description);
             data.append("city", formData.city);
 
-            // Append each image file
             formData.images.forEach((image) => {
                 data.append("images", image);
             });
 
-            //console.log("FormData before sending:", [...data.entries()]); // Debugging
-
-            const response = await sell(data);
-            //console.log("Response:", response);
-
+            await sell(data);
             alert("Item listed successfully");
-            navigate("/dashboard"); // Redirect after successful upload
+            navigate("/dashboard");
         } catch (error) {
             console.error("Error:", error);
-            alert("Failed to list item.",error.message);
+            alert("Failed to list item.");
+        } finally {
+            setLoading(false); // Stop loading
         }
     };
 
@@ -98,10 +96,8 @@ const Sell = () => {
                     <TextField label="Description" name="description" value={formData.description} onChange={handleChange} multiline rows={3} required fullWidth />
                     <TextField label="City" name="city" value={formData.city} onChange={handleChange} required fullWidth />
 
-                    {/* Image Upload Input */}
                     <input type="file" accept="image/*" multiple onChange={handleFileChange} />
 
-                    {/* Image Preview */}
                     {imagePreviews.length > 0 && (
                         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                             {imagePreviews.map((src, index) => (
@@ -110,8 +106,8 @@ const Sell = () => {
                         </Box>
                     )}
 
-                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-                        List Item
+                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }} disabled={loading}>
+                        {loading ? <CircularProgress size={24} color="inherit" /> : "List Item"}
                     </Button>
                 </Box>
             </Card>
