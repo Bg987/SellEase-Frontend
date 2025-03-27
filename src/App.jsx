@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Signup from "./components/Signup";
+import Signup from "./components/signup";
 import VerifyOTP from "./components/VerifyOTP";
 import Login from "./components/login";
 import Dashboard from "./components/Dashboard";
