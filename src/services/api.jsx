@@ -3,7 +3,7 @@ import { useEffect, } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API = axios.create({
-    baseURL: "http://192.168.254.47:5000", // Backend URL
+    baseURL: "https://sellease-backend.onrender.com", // Backend URL
     withCredentials: true
 });
 
