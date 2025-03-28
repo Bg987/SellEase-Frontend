@@ -57,6 +57,30 @@ const Buy = () => {
         fetch();
     }, []);
 
+    useEffect(() => {
+        let filtered = history;
+
+        if (search) {
+            filtered = filtered.filter(item => item.itemName.toLowerCase().includes(search.toLowerCase()));
+        }
+        if (filterCategory) {
+            filtered = filtered.filter(item => item.category === filterCategory);
+        }
+        if (filterCity) {
+            filtered = filtered.filter(item => item.city === filterCity);
+        }
+        if (filterStatus) {
+            filtered = filtered.filter(item => item.status === filterStatus);
+        }
+        if (sortOrder === "price-asc") {
+            filtered = [...filtered].sort((a, b) => a.sellPrice - b.sellPrice);
+        } else if (sortOrder === "price-desc") {
+            filtered = [...filtered].sort((a, b) => b.sellPrice - a.sellPrice);
+        }
+
+        setFilteredHistory(filtered);
+    }, [search, filterCategory, filterCity, filterStatus, sortOrder, history]);
+
     return (
         <Box sx={{ minHeight: "100vh", padding: 3, background: "#f9f9f9" }}>
             <Button variant="contained" startIcon={<ArrowBack />} sx={{ mb: 2 }} onClick={() => navigate("/messages")}>
@@ -70,61 +94,67 @@ const Buy = () => {
                 Buy Second Hand Items
             </Typography>
 
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                    <TextField
+                        label="Search"
+                        fullWidth
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        InputProps={{
+                            endAdornment: search && (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={() => setSearch("")}>
+                                        <Clear />
+                                    </IconButton>
+                                </InputAdornment>
+                            )
+                        }}
+                    />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <TextField select label="Category" fullWidth value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="Electronics">Electronics</MenuItem>
+                        <MenuItem value="Automobiles">Automobiles</MenuItem>
+                        <MenuItem value="Home Appliances">Home Appliances</MenuItem>
+                    </TextField>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <TextField select label="City" fullWidth value={filterCity} onChange={(e) => setFilterCity(e.target.value)}>
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="Ahmedabad">Ahmedabad</MenuItem>
+                        <MenuItem value="Surat">Surat</MenuItem>
+                        <MenuItem value="Rajkot">Rajkot</MenuItem>
+                    </TextField>
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                    <TextField select label="Status" fullWidth value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="Available">Available</MenuItem>
+                        <MenuItem value="Sold">Sold</MenuItem>
+                    </TextField>
+                </Grid>
+            </Grid>
             <Grid container spacing={3}>
                 {loading ? (
                     Array.from(new Array(6)).map((_, index) => (
                         <Grid item xs={12} sm={6} md={4} key={index}>
-                            <Card>
-                                <Skeleton variant="rectangular" width="100%" height={180} />
-                                <CardContent>
-                                    <Skeleton width="60%" />
-                                    <Skeleton width="80%" />
-                                    <Skeleton width="40%" />
-                                    <Skeleton width="90%" />
-                                    <Skeleton variant="rectangular" width="100%" height={36} />
-                                </CardContent>
-                            </Card>
+                            <Skeleton variant="rectangular" width="100%" height={180} />
+                            <CardContent>
+                                <Skeleton width="60%" />
+                            </CardContent>
                         </Grid>
                     ))
                 ) : filteredHistory.length > 0 ? (
                     filteredHistory.map((item) => (
                         <Grid item xs={12} sm={6} md={4} key={item.sellId}>
                             <Card>
-                                {item.images?.length > 0 ? (
-                                    <CardMedia
-                                        component="img"
-                                        height="180"
-                                        image={item.images[0]}
-                                        alt={item.itemName}
-                                        loading="lazy"
-                                        sx={{ objectFit: "cover" }}
-                                    />
-                                ) : (
-                                    <CardMedia
-                                        component="img"
-                                        height="180"
-                                        image="/default-placeholder.jpg"
-                                        alt="No Image"
-                                        loading="lazy"
-                                        sx={{ objectFit: "cover" }}
-                                    />
-                                )}
+                                <CardMedia component="img" height="180" image={item.images?.[0] || "/default-placeholder.jpg"} alt={item.itemName} />
                                 <CardContent>
-                                    <Typography variant="h6"><b>{item.itemName}</b></Typography>
-                                    <Typography variant="body2"><b>Category:</b> {item.category}</Typography>
-                                    <Typography variant="body2"><b>Price:</b> ₹{item.sellPrice}</Typography>
-                                    <Typography variant="body2"><b>City:</b> {item.city}</Typography>
-                                    <Typography variant="body2"><b>Status:</b> {item.status}</Typography>
-                                    <Typography variant="body2">
-                                        <b>Uploaded:</b> {formatDistanceToNow(new Date(item.uploadDate), { addSuffix: true })}
-                                    </Typography>
-                                    <Typography variant="body2"><b>Description:</b> {item.description}</Typography>
-                                    <Button
-                                        variant="contained"
-                                        startIcon={<Chat />}
-                                        sx={{ mt: 2 }}
-                                        onClick={() => navigate(`/chat`, { state: { item } })}
-                                    >
+                                    <Typography variant="h6">{item.itemName}</Typography>
+                                    <Typography variant="body2">₹{item.sellPrice}</Typography>
+                                    <Button variant="contained" startIcon={<Chat />} onClick={() => navigate(`/chat`, { state: { item } })}>
                                         Chat
                                     </Button>
                                 </CardContent>
@@ -132,9 +162,7 @@ const Buy = () => {
                         </Grid>
                     ))
                 ) : (
-                    <Typography variant="body1" color="red" sx={{ mt: 2 }}>
-                        {filterCity ? `No items for sale in ${filterCity}` : "No items for sale"}
-                    </Typography>
+                    <Typography variant="body1" color="red">No items found</Typography>
                 )}
             </Grid>
         </Box>
