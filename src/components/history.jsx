@@ -32,6 +32,9 @@ const History = () => {
     const isMobile = useMediaQuery("(max-width: 600px)");
 
     useEffect(() => {
+        const cityName = localStorage.getItem("City");
+        if (cityName) setFilterCity(cityName);
+
         const fetchHistory = async () => {
             try {
                 setIsLoading(true);
