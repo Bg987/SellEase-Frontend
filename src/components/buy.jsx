@@ -15,7 +15,7 @@ import {
     CardMedia,
     Skeleton
 } from "@mui/material";
-import { ArrowBack, Clear,Chat } from "@mui/icons-material";
+import { ArrowBack, Clear, Chat } from "@mui/icons-material";
 import { BuyItem } from "../services/api";
 
 const Buy = () => {
@@ -29,7 +29,13 @@ const Buy = () => {
     const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
     const isMobile = useMediaQuery("(max-width: 600px)");
-
+    const handleChat = (item) => {
+        if (item) {
+            alert("error");
+            return;
+        }
+        navigate(`/chat`, { state: { item } });
+    };
     useEffect(() => {
         const cityName = localStorage.getItem("City");
         if (cityName) setFilterCity(cityName);
@@ -200,6 +206,7 @@ const Buy = () => {
                                         <b>Uploaded:</b> {formatDistanceToNow(new Date(item.uploadDate), { addSuffix: true })}
                                     </Typography>
                                     <Typography variant="body2"><b>Description:</b> {item.description}</Typography>
+                                    <Button varient="contained" startIcon={<Chat />} sx={{ mt: 2 }} onclick={() => handleChat(item)}></Button>
                                 </CardContent>
                             </Card>
                         </Grid>
