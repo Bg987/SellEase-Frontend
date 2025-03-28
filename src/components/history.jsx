@@ -12,7 +12,6 @@ import {
     MenuItem,
     CardMedia,
     useMediaQuery,
-    InputAdornment,
     IconButton,
     Skeleton
 } from "@mui/material";

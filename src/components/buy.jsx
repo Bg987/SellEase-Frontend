@@ -25,7 +25,7 @@ const Buy = () => {
     const [filterCity, setFilterCity] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
     const [sortOrder, setSortOrder] = useState("");
-    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate();
     const isMobile = useMediaQuery("(max-width: 600px)");
 
@@ -52,7 +52,6 @@ const Buy = () => {
         fetchItems();
     }, []);
 
-    // Apply filters and sorting
     useEffect(() => {
         let filtered = history.filter((item) =>
             item.itemName.toLowerCase().includes(search.toLowerCase()) &&
@@ -98,15 +97,6 @@ const Buy = () => {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     fullWidth
-                    InputProps={{
-                        endAdornment: search && (
-                            <InputAdornment position="end">
-                                <IconButton onClick={() => setSearch("")} size="small">
-                                    <Clear />
-                                </IconButton>
-                            </InputAdornment>
-                        ),
-                    }}
                 />
 
                 <TextField
@@ -115,15 +105,6 @@ const Buy = () => {
                     value={filterCity}
                     onChange={(e) => setFilterCity(e.target.value)}
                     fullWidth
-                    InputProps={{
-                        endAdornment: filterCity && (
-                            <InputAdornment position="end">
-                                <IconButton onClick={() => setFilterCity("")} size="small">
-                                    <Clear />
-                                </IconButton>
-                            </InputAdornment>
-                        ),
-                    }}
                 />
 
                 <TextField
