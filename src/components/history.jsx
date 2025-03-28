@@ -25,7 +25,7 @@ const History = () => {
     const [filterCategory, setFilterCategory] = useState("");
     const [filterCity, setFilterCity] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
-    const [sortOrder, setSortOrder] = useState(""); 
+    const [sortOrder, setSortOrder] = useState("");
     const [isLoading, setIsLoading] = useState(true); // Loading state
     const navigate = useNavigate();
     const isMobile = useMediaQuery("(max-width: 600px)");
@@ -104,11 +104,9 @@ const History = () => {
                     fullWidth
                     InputProps={{
                         endAdornment: search && (
-                            <InputAdornment position="end">
-                                <IconButton onClick={() => setSearch("")} size="small">
-                                    <Clear />
-                                </IconButton>
-                            </InputAdornment>
+                            <IconButton onClick={() => setSearch("")} size="small">
+                                <Clear />
+                            </IconButton>
                         ),
                     }}
                 />
@@ -121,12 +119,9 @@ const History = () => {
                     fullWidth
                     InputProps={{
                         endAdornment: filterCity && (
-                            <InputAdornment position="end">
-                                <IconButton onClick={() => setFilterCity("")} size="small">
-                                    <Clear />
-                                </IconButton>
-                            </InputAdornment>
-                        ),
+                            <IconButton onClick={() => setFilterCity("")} size="small">
+                                <Clear />
+                            </IconButton>),
                     }}
                 />
 
