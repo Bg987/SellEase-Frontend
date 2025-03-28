@@ -15,7 +15,7 @@ import {
     CardMedia,
     Skeleton
 } from "@mui/material";
-import { ArrowBack, clear,Chat } from "@mui/icons-material";
+import { ArrowBack, Clear,Chat } from "@mui/icons-material";
 import { BuyItem } from "../services/api";
 
 const Buy = () => {
