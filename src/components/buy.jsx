@@ -105,8 +105,13 @@ const Buy = () => {
                     value={filterCity}
                     onChange={(e) => setFilterCity(e.target.value)}
                     fullWidth
+                    InputProps={{
+                        endAdornment: filterCity && (
+                            <IconButton onClick={() => setFilterCity("")} size="small">
+                                <Clear />
+                            </IconButton>),
+                    }}
                 />
-
                 <TextField
                     select
                     label="Category"
