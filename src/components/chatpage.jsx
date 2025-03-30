@@ -7,39 +7,36 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import isToday from "dayjs/plugin/isToday";
 import isYesterday from "dayjs/plugin/isYesterday";
-import { chatHistory, chatSeen } from "../services/api"; // API calls
+import { chatHistory, chatSeen, SName } from "../services/api"; // API calls
 
 dayjs.extend(relativeTime);
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 
-const socket = io("https://sellease-backend.onrender.com", { transports: ["websocket", "polling"] });
+const socket = io("http://192.168.254.47:5000", { transports: ["websocket", "polling"] });
 
 const ChatPage = () => {
     const location = useLocation();
     const item = location.state?.item;
-    const sellerId = item?.userId;//seller's userid not logged in userid
-    const itemName = item?.itemName || "this item";
-    const senderId = localStorage.getItem("userId");//logged in userid
-
+    const sellerId = item?.userId;//seller's/receiver's userid not logged in userid
+    const name = item?.NAME;
+    const itemName = item?.itemName;
+    const senderId = localStorage.getItem("userId");//(sender)logged in userid
     const [messages, setMessages] = useState([]);
-    const [message, setMessage] = useState(`Interested in ${itemName}`);
+    const [message, setMessage] = useState(itemName?`Interested in ${itemName}`:"");
     const [customSellerName, setCustomSellerName] = useState("");
     const [isEditingName, setIsEditingName] = useState(false);
     const messageListRef = useRef(null);
     const navigate = useNavigate();
 
     // Load seller name from localStorage
-    useEffect(() => {
-        if (!sellerId) return;
-        const savedNames = JSON.parse(localStorage.getItem("sellerNames")) || {};
-        setCustomSellerName(savedNames[sellerId] || `Seller of ${itemName}`);
+    useEffect(() => {  
+        setCustomSellerName((name!=sellerId)?name:"user");//if name not save in database name = sellerid so 
     }, [sellerId, itemName]);
 
     useEffect(() => {
         if (!sellerId) return;
         socket.emit("join", senderId);
-
         const markMessagesAsSeen = async () => {
             try {
                 await chatSeen(sellerId);
@@ -56,10 +53,9 @@ const ChatPage = () => {
                 console.error("Error fetching messages", error);
             }
         };
-
+        //defauly functions 
         markMessagesAsSeen();
         fetchMessages();
-
         socket.on("receiveMessage", (newMessage) => {
             if ((newMessage.senderId === sellerId && newMessage.receiverId === senderId) ||
                 (newMessage.senderId === senderId && newMessage.receiverId === sellerId)) {
@@ -107,13 +103,21 @@ const ChatPage = () => {
     }, {});
 
     // Save custom seller name
-    const saveSellerName = () => {
-        const savedNames = JSON.parse(localStorage.getItem("sellerNames")) || {};
-        savedNames[sellerId] = customSellerName;
-        localStorage.setItem("sellerNames", JSON.stringify(savedNames));
-        setIsEditingName(false);
+    const saveSellerName = async () => {
+        if (sellerId && customSellerName) {
+            try {
+                const res = await SName(sellerId, customSellerName);//req to server
+                if (res.data.success) {
+                    setCustomSellerName(customSellerName); // Update UI immediately
+                    setIsEditingName(false);
+                }
+            }
+            catch (err) {
+                alert("error in change name feature");
+                console.log("error = ", error);
+            }
+        }
     };
-
     return (
         <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", maxWidth: { xs: "100%", sm: 700 }, margin: "auto", bgcolor: "#f5f5f5" }}>
             {/* Fixed Header with Back Button */}

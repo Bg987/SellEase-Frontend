@@ -3,11 +3,10 @@ import { useEffect, } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API = axios.create({
-    baseURL: "https://sellease-backend.onrender.com", // Backend URL
+    baseURL: "http://192.168.254.47:5000", // Backend URL
     withCredentials: true
 });
-
-// Signup - Request OTP
+//https://sellease-backend.onrender.com
 export const signup = (userData) => API.post("/auth/signup", userData);
 
 // Verify OTP & Complete Signup
@@ -52,31 +51,31 @@ export const check = (isLoggedIn) => {
 
 }
 export const unreadMessage = () => {
-    return API.get("/api/chat/unread",{
-         headers: {
-             "Content-Type": "application/json",
-         },
-     });
- }
- export const chatHistory = (sellerId) => {
-     return API.post("/api/chat/history",{sellerId},{
-          headers: {
-              "Content-Type": "application/json",
-          },
-      });
- }
- export const chatSeen = (sellerId) => {
-     return API.put("/api/chat/markAsRead",{sellerId},{
-          headers: {
-              "Content-Type": "application/json",
-          },
-      });
- }
+    return API.get("/api/chat/unread", {
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+}
+export const chatHistory = (sellerId) => {
+    return API.post("/api/chat/history", { sellerId }, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+}
+export const chatSeen = (sellerId) => {
+    return API.put("/api/chat/markAsRead", { sellerId }, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+}
 export const getChatUsers = () =>
     API.get("/api/chat/chatUser", {
         headers: {
             "Content-Type": "application/json",
         },
     });
-
+export const SName = (friendId,friendName) => API.post("api/chat/setName", {friendId,friendName});
 export default API;

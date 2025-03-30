@@ -7,6 +7,7 @@ import { getChatUsers } from "../services/api"; // API call to fetch chat users
 const Messages = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const uId = localStorage.getItem("userId");//logged in userid
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
@@ -15,15 +16,11 @@ const Messages = () => {
             try {
                 const response = await getChatUsers();
                 const { users: userList } = response.data;
-
-                const storedNames = JSON.parse(localStorage.getItem("sellerNames")) || {};
-
-                const formattedUsers = userList.map(({ userId, hasUnreadMessages }) => ({
+                const formattedUsers = userList.map(({ userId, name,hasUnreadMessages }) => ({
                     userId,
-                    username: storedNames[userId] || `User ${userId}`,
+                    name,
                     hasUnreadMessages,
                 }));
-
                 setUsers(formattedUsers);
             } catch (error) {
                 console.error("Error fetching chat users:", error);
@@ -32,15 +29,15 @@ const Messages = () => {
                 setLoading(false);
             }
         };
-
         fetchUsers();
     }, []);
 
 
     
-    const handliclick = (id) => {
+    const handliclick = (id,name) => {
         let item = [];//beacause of buy componenet
         item.userId = id
+        item.NAME= name;
         navigate("/chat", { state: { item } })
     }
 
@@ -67,10 +64,10 @@ const Messages = () => {
                 </Typography>
             ) : (
                 <List>
-                    {users.map(({ userId, username, hasUnreadMessages }) => (
+                    {users.map(({ userId, name, hasUnreadMessages }) => (
                         <Box key={userId}>
-                            <ListItem button onClick={() => handliclick(userId)}>
-                                <ListItemText primary={username} secondary="Tap to chat" />
+                            <ListItem button onClick={() => handliclick(userId,name)}>
+                                <ListItemText primary={name==uId?`(YOU)`:name} secondary="Tap to chat" />
                                 {hasUnreadMessages && (
                                     <FiberManualRecord
                                         sx={{
