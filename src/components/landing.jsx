@@ -4,7 +4,6 @@ import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent
 import { Category, Home, ShoppingBag } from "@mui/icons-material";
 import { useGlobalState } from './GS';
 import { logout } from "../services/api";
-import logo from "../../public/logo.png";
 
 const SellEaseLanding = () => {
   const { isLoggedIn, dologin, dologout } = useGlobalState();

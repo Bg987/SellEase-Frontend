@@ -37,7 +37,7 @@ const Messages = () => {
     const handliclick = (id,name) => {
         let item = [];//beacause of buy componenet
         item.userId = id
-        item.NAME= name;
+        item.NAME= name;//friendname
         navigate("/chat", { state: { item } })
     }
 

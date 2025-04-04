@@ -13,9 +13,13 @@ import {
     CardMedia,
     useMediaQuery,
     IconButton,
-    Skeleton
+    Skeleton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    useTheme
 } from "@mui/material";
-import { ArrowBack, Clear } from "@mui/icons-material";
+import { ArrowBack, Clear, ArrowLeft, ArrowRight, Close} from "@mui/icons-material";
 import { historyFetch } from "../services/api";
 
 const History = () => {
@@ -25,10 +29,14 @@ const History = () => {
     const [filterCategory, setFilterCategory] = useState("");
     const [filterCity, setFilterCity] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
-    const [sortOrder, setSortOrder] = useState("");
-    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const [sortOrder, setSortOrder] = useState("recent");
+    const [isLoading, setIsLoading] = useState(true);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [imageIndex, setImageIndex] = useState(0);
+
     const navigate = useNavigate();
-    const isMobile = useMediaQuery("(max-width: 600px)");
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
     useEffect(() => {
         const cityName = localStorage.getItem("City");
@@ -74,8 +82,31 @@ const History = () => {
         setFilteredHistory(filtered);
     }, [search, filterCategory, filterCity, filterStatus, sortOrder, history]);
 
+    const handleOpenDialog = (item) => {
+        setSelectedItem(item);
+        setImageIndex(0);
+    };
+
+    const handleCloseDialog = () => {
+        setSelectedItem(null);
+        setImageIndex(0);
+    };
+
+    const handleNextImage = () => {
+        if (selectedItem && selectedItem.images.length > 1) {
+            setImageIndex((prev) => (prev + 1) % selectedItem.images.length);
+        }
+    };
+
+    const handlePrevImage = () => {
+        if (selectedItem && selectedItem.images.length > 1) {
+            setImageIndex((prev) => (prev - 1 + selectedItem.images.length) % selectedItem.images.length);
+        }
+    };
+
     return (
         <Box sx={{ minHeight: "100vh", padding: 3, background: "#f9f9f9" }}>
+            {/* Back Button */}
             <Button
                 variant="contained"
                 startIcon={<ArrowBack />}
@@ -84,16 +115,19 @@ const History = () => {
             >
                 Back to Dashboard
             </Button>
+
             <Typography variant="h4" gutterBottom>
                 Your Sell History
             </Typography>
 
+            {/* Filters */}
             <Box
                 sx={{
                     display: "flex",
                     flexDirection: isMobile ? "column" : "row",
                     gap: 2,
                     mb: 3,
+                    flexWrap: "wrap",
                 }}
             >
                 <TextField
@@ -117,12 +151,6 @@ const History = () => {
                     value={filterCity}
                     onChange={(e) => setFilterCity(e.target.value)}
                     fullWidth
-                    InputProps={{
-                        endAdornment: filterCity && (
-                            <IconButton onClick={() => setFilterCity("")} size="small">
-                                <Clear />
-                            </IconButton>),
-                    }}
                 />
 
                 <TextField
@@ -140,14 +168,14 @@ const History = () => {
 
                 <TextField
                     select
-                    label="Availability"
+                    label="Status"
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
                     fullWidth
                 >
                     <MenuItem value="">All</MenuItem>
-                    <MenuItem value="available">Available</MenuItem>
-                    <MenuItem value="sold">Sold</MenuItem>
+                    <MenuItem value="Available">Available</MenuItem>
+                    <MenuItem value="Sold">Sold</MenuItem>
                 </TextField>
 
                 <TextField
@@ -160,58 +188,36 @@ const History = () => {
                     <MenuItem value="recent">Most Recent</MenuItem>
                     <MenuItem value="oldest">Oldest</MenuItem>
                 </TextField>
+
             </Box>
 
+            {/* Items Grid */}
             <Grid container spacing={3}>
                 {isLoading ? (
                     Array.from({ length: 6 }).map((_, index) => (
                         <Grid item xs={12} sm={6} md={4} key={index}>
-                            <Card>
-                                <Skeleton variant="rectangular" width="100%" height={180} />
-                                <CardContent>
-                                    <Skeleton width="60%" height={30} />
-                                    <Skeleton width="80%" />
-                                    <Skeleton width="50%" />
-                                    <Skeleton width="70%" />
-                                    <Skeleton width="90%" />
-                                </CardContent>
-                            </Card>
+                            <Skeleton variant="rectangular" width="100%" height={180} />
                         </Grid>
                     ))
                 ) : filteredHistory.length > 0 ? (
                     filteredHistory.map((item) => (
                         <Grid item xs={12} sm={6} md={4} key={item.sellId}>
-                            <Card sx={{ height: "100%" }}>
-                                {item.images?.length > 0 ? (
-                                    <CardMedia
-                                        component="img"
-                                        height="180"
-                                        image={item.images[0]}
-                                        alt={item.itemName}
-                                        loading="lazy"
-                                        sx={{ objectFit: "cover" }}
-                                    />
-                                ) : (
-                                    <CardMedia
-                                        component="img"
-                                        height="180"
-                                        image="/default-placeholder.jpg"
-                                        alt="No Image"
-                                        loading="lazy"
-                                        sx={{ objectFit: "cover" }}
-                                    />
-                                )}
-
+                            <Card sx={{ height: "100%", cursor: "pointer" }} onClick={() => handleOpenDialog(item)}>
+                                <CardMedia
+                                    component="img"
+                                    height="180"
+                                    image={item.images?.[0] || "/default-placeholder.jpg"}
+                                    alt={item.itemName}
+                                    sx={{ objectFit: "cover" }}
+                                />
                                 <CardContent>
                                     <Typography variant="h6">{item.itemName}</Typography>
                                     <Typography variant="body2"><b>Category:</b> {item.category}</Typography>
                                     <Typography variant="body2"><b>Price:</b> ₹{item.sellPrice}</Typography>
-                                    <Typography variant="body2"><b>City: </b> {item.city}</Typography>
-                                    <Typography variant="body2"><b>Status: </b> {item.status}</Typography>
+                                    <Typography variant="body2"><b>Status:</b> {item.status}</Typography>
                                     <Typography variant="body2">
                                         <b>Uploaded:</b> {formatDistanceToNow(new Date(item.uploadDate), { addSuffix: true })}
                                     </Typography>
-                                    <Typography variant="body2"><b>Description:</b> {item.description}</Typography>
                                 </CardContent>
                             </Card>
                         </Grid>
@@ -222,6 +228,79 @@ const History = () => {
                     </Typography>
                 )}
             </Grid>
+            {selectedItem && (
+                <Dialog
+                    open={Boolean(selectedItem)}
+                    onClose={handleCloseDialog}
+                    fullScreen={isMobile}
+                    maxWidth="sm"
+                    fullWidth
+                >
+                    <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        {selectedItem.itemName}
+                        <IconButton onClick={handleCloseDialog}>
+                            <Close />
+                        </IconButton>
+                    </DialogTitle>
+
+                    <DialogContent sx={{ textAlign: "center" }}>
+                        {/* Image with Navigation */}
+                        <Box sx={{ position: "relative", width: "100%", height: 250, display: "flex", justifyContent: "center" }}>
+                            {/* Previous Image Button */}
+                            {selectedItem.images.length > 1 && (
+                                <IconButton
+                                    onClick={handlePrevImage}
+                                    sx={{
+                                        position: "absolute",
+                                        left: 10,
+                                        top: 10,  // Move to top
+                                        backgroundColor: "rgba(0,0,0,0.5)",
+                                        color: "white",
+                                        "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" }
+                                    }}
+                                >
+                                    <ArrowLeft />
+                                </IconButton>
+                            )}
+
+                            {/* Image Display */}
+                            <CardMedia
+                                component="img"
+                                image={selectedItem.images?.[imageIndex] || "/default-placeholder.jpg"}
+                                alt={selectedItem.itemName}
+                                sx={{ maxWidth: "100%", maxHeight: 250, objectFit: "contain" }}
+                            />
+
+                            {/* Next Image Button */}
+                            {selectedItem.images.length > 1 && (
+                                <IconButton
+                                    onClick={handleNextImage}
+                                    sx={{
+                                        position: "absolute",
+                                        right: 10,
+                                        top: 10,  // Move to top
+                                        backgroundColor: "rgba(0,0,0,0.5)",
+                                        color: "white",
+                                        "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" }
+                                    }}
+                                >
+                                    <ArrowRight />
+                                </IconButton>
+                            )}
+                        </Box>
+
+
+                        {/* Item Details */}
+                        <Typography variant="body1" sx={{ mt: 2 }}><b>Category:</b> {selectedItem.category}</Typography>
+                        <Typography variant="body1"><b>Price:</b> ₹{selectedItem.sellPrice}</Typography>
+                        <Typography variant="body1"><b>City:</b> {selectedItem.city}</Typography>
+                        <Typography variant="body1"><b>Status:</b> {selectedItem.status}</Typography>
+                        <Typography variant="body1">
+                            <b>Uploaded:</b> {formatDistanceToNow(new Date(selectedItem.uploadDate), { addSuffix: true })}
+                        </Typography>
+                    </DialogContent>
+                </Dialog>
+            )}
         </Box>
     );
 };

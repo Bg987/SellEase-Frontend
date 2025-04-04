@@ -15,7 +15,7 @@ import {
     InputAdornment,
     IconButton
 } from "@mui/material";
-import { ArrowBack, Clear,Chat } from "@mui/icons-material";
+import { ArrowBack, Clear, Chat,ArrowLeft, ArrowRight } from "@mui/icons-material";
 import { BuyItem } from "../services/api";
 
 const Buy = () => {
@@ -24,20 +24,21 @@ const Buy = () => {
     const [search, setSearch] = useState("");
     const [filterCategory, setFilterCategory] = useState("");
     const [filterCity, setFilterCity] = useState("");
+    const [imageIndexes, setImageIndexes] = useState({}); // Track image index for each item
     const [filterStatus, setFilterStatus] = useState("");
     const [sortOrder, setSortOrder] = useState("");
     const navigate = useNavigate();
     const isMobile = useMediaQuery("(max-width: 600px)");
-    const handleChat = (sellerId,name,item) => {
-        if (!sellerId||!name||!item) {
+    const handleChat = (sellerId, name, item) => {
+        if (!sellerId || !name || !item) {
             alert("error");
             return;
         }
-        navigate(`/chat`, { state: {item} });
+        navigate(`/chat`, { state: { item } });
     };
     useEffect(() => {
         const cityName = localStorage.getItem("City");
-        if(cityName){
+        if (cityName) {
             setFilterCity(cityName);
         }
         const fetch = async () => {
@@ -45,6 +46,7 @@ const Buy = () => {
                 const response = await BuyItem();
                 if (response.data.success) {
                     setHistory(response.data.items);
+                    console.log(response);
                     setFilteredHistory(response.data.items);
                 } else {
                     setHistory([]);
@@ -76,13 +78,25 @@ const Buy = () => {
 
         setFilteredHistory(filtered);
     }, [search, filterCategory, filterCity, filterStatus, sortOrder, history]);
+    const handleImageChange = (sellId, direction) => {
+        setImageIndexes((prevIndexes) => {
+            const currentIndex = prevIndexes[sellId] || 0;
+            const totalImages = history.find(item => item.sellId === sellId)?.images.length || 1;
+
+            let newIndex = currentIndex + direction;
+            if (newIndex < 0) newIndex = totalImages - 1; // Loop back to last image
+            if (newIndex >= totalImages) newIndex = 0; // Loop back to first image
+
+            return { ...prevIndexes, [sellId]: newIndex };
+        });
+    };
 
     return (
         <Box sx={{ minHeight: "100vh", padding: 3, background: "#f9f9f9" }}>
             {/* Back Button */}
-            <Button variant="contained" startIcon={<ArrowBack />}  sx={{ mb: 2 }} onClick={() => navigate("/messages")}>
-                        Messages
-                    </Button>
+            <Button variant="contained" startIcon={<ArrowBack />} sx={{ mb: 2 }} onClick={() => navigate("/messages")}>
+                Messages
+            </Button>
             <Button
                 variant="contained"
                 startIcon={<ArrowBack />}
@@ -91,7 +105,7 @@ const Buy = () => {
             >
                 Back to Dashboard
             </Button>
-            
+
             <Typography variant="h4" gutterBottom>
                 Buy Second Hand items
             </Typography>
@@ -193,23 +207,44 @@ const Buy = () => {
                     filteredHistory.map((item) => (
                         <Grid item xs={12} sm={6} md={4} key={item.sellId}>
                             <Card sx={{ height: "100%" }}>
-                                {item.images?.length > 0 ? (
-                                    <CardMedia
+                                <Box sx={{ position: "relative" }}>
+                                    {item.images?.length > 0 ? (
+                                        <CardMedia
                                         component="img"
                                         height="180"
-                                        image={item.images[0]} // First image
+                                        image={item.images[imageIndexes[item.sellId] || 0]}
                                         alt={item.itemName}
-                                        sx={{ objectFit: "cover" }}
+                                        sx={{ objectFit: "contain", width: "100%", height: "auto", maxHeight: "300px" }}
                                     />
-                                ) : (
-                                    <CardMedia
-                                        component="img"
-                                        height="180"
-                                        image="/default-placeholder.jpg" // Placeholder
-                                        alt="No Image"
-                                        sx={{ objectFit: "cover" }}
-                                    />
-                                )}
+                                    
+                                    ) : (
+                                        <CardMedia
+                                            component="img"
+                                            height="180"
+                                            image="/default-placeholder.jpg"
+                                            alt="No Image"
+                                            sx={{ objectFit: "cover" }}
+                                        />
+                                    )}
+                                    {/* Left Arrow */}
+                                    {item.images?.length > 1 && (
+                                        <IconButton
+                                            sx={{ position: "absolute", top: "50%", left: 5, background: "white" }}
+                                            onClick={() => handleImageChange(item.sellId, -1)}
+                                        >
+                                            <ArrowLeft />
+                                        </IconButton>
+                                    )}
+                                    {/* Right Arrow */}
+                                    {item.images?.length > 1 && (
+                                        <IconButton
+                                            sx={{ position: "absolute", top: "50%", right: 5, background: "white" }}
+                                            onClick={() => handleImageChange(item.sellId, 1)}
+                                        >
+                                            <ArrowRight />
+                                        </IconButton>
+                                    )}
+                                </Box>
                                 <CardContent>
                                     <Typography variant="h6"><b>{item.itemName}</b></Typography>
                                     <Typography variant="body2"><b>Category:</b> {item.category}</Typography>
@@ -224,7 +259,7 @@ const Buy = () => {
                                         variant="contained"
                                         startIcon={<Chat />}
                                         sx={{ mt: 2 }}
-                                        onClick={() => handleChat(item.userId, item.itemName,item)}
+                                        onClick={() => handleChat(item.userId, item.itemName, item)}
                                     >
                                         Chat
                                     </Button>
@@ -234,7 +269,7 @@ const Buy = () => {
                     ))
                 ) : (
                     <Typography variant="body1" color="red" sx={{ mt: 2 }}>
-                        { localStorage.getItem("City")? "no item for sell in your city":"no item for sell"}
+                        {localStorage.getItem("City") ? "no item for sell in your city" : "no item for sell"}
                     </Typography>
                 )}
             </Grid>

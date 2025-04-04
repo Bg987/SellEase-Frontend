@@ -78,5 +78,6 @@ export const getChatUsers = () =>
             "Content-Type": "application/json",
         },
     });
-export const SName = (friendId,friendName) => API.post("api/chat/setName", {friendId,friendName});
+export const SetName = (friendId, friendName) => API.post("api/chat/setName", { friendId, friendName });//save name
+export const GetName = (friendId) => API.post("api/chat/getName", { friendId});//get name
 export default API;

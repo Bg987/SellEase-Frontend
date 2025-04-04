@@ -9,7 +9,8 @@ const categories = ["Automobiles", "Electronics", "Home Appliances"];
 const Sell = () => {
     const navigate = useNavigate();
     const { isLoggedIn, dologout } = useGlobalState();
-    const [loading, setLoading] = useState(false); // Loading state
+    const [loading, setLoading] = useState(false);
+
     const [formData, setFormData] = useState({
         itemName: "",
         category: "",
@@ -35,42 +36,44 @@ const Sell = () => {
 
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
-
-        if (files.length > 5) {
-            alert("You can upload up to 5 images only.");
-            return;
-        }
+        const updatedImages = [...formData.images, ...files];
 
         setFormData((prevData) => ({
             ...prevData,
-            images: files,
+            images: updatedImages,
         }));
 
-        const previews = files.map((file) => URL.createObjectURL(file));
+        const previews = updatedImages.map((file) => ({
+            url: URL.createObjectURL(file),
+            name: file.name,
+        }));
         setImagePreviews(previews);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (formData.images.length !== 3) {
+            alert("Must upload exactly 3 images");
+            return;
+        }
+
         setLoading(true); // Start loading
+        const data = new FormData();
+        data.append("itemName", formData.itemName);
+        data.append("category", formData.category);
+        data.append("sellPrice", formData.sellPrice);
+        data.append("description", formData.description);
+        data.append("city", formData.city);
+
+        formData.images.forEach((image) => {
+            data.append("images", image);
+        });
 
         try {
-            const data = new FormData();
-            data.append("itemName", formData.itemName);
-            data.append("category", formData.category);
-            data.append("sellPrice", formData.sellPrice);
-            data.append("description", formData.description);
-            data.append("city", formData.city);
-
-            formData.images.forEach((image) => {
-                data.append("images", image);
-            });
-
-            await sell(data);
+            const response = await sell(data);
             alert("Item listed successfully");
             navigate("/dashboard");
         } catch (error) {
-            console.error("Error:", error);
             alert("Failed to list item.");
         } finally {
             setLoading(false); // Stop loading
@@ -85,23 +88,27 @@ const Sell = () => {
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                     <TextField label="Item Name" name="itemName" value={formData.itemName} onChange={handleChange} required fullWidth />
-                    
                     <TextField select label="Category" name="category" value={formData.category} onChange={handleChange} required fullWidth>
                         {categories.map((cat) => (
                             <MenuItem key={cat} value={cat}>{cat}</MenuItem>
                         ))}
                     </TextField>
-
                     <TextField label="Price" name="sellPrice" type="number" value={formData.sellPrice} onChange={handleChange} required fullWidth />
                     <TextField label="Description" name="description" value={formData.description} onChange={handleChange} multiline rows={3} required fullWidth />
                     <TextField label="City" name="city" value={formData.city} onChange={handleChange} required fullWidth />
 
                     <input type="file" accept="image/*" multiple onChange={handleFileChange} />
+                    <Typography variant="body2" color="textSecondary">
+                        Please upload exactly 3 images. (Once selected, they cannot be removed; refresh to reset.)
+                    </Typography>
 
                     {imagePreviews.length > 0 && (
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                            {imagePreviews.map((src, index) => (
-                                <img key={index} src={src} alt={`preview-${index}`} width="100px" height="100px" />
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, justifyContent: "center" }}>
+                            {imagePreviews.map((img, index) => (
+                                <Box key={index} sx={{ textAlign: "center" }}>
+                                    <img src={img.url} alt={`preview-${index}`} width="100px" height="100px" />
+                                    <Typography variant="body2">{img.name}</Typography>
+                                </Box>
                             ))}
                         </Box>
                     )}
