@@ -29,6 +29,7 @@ const Signup = () => {
             const response = await signup(formData);
             navigate("/verify-otp", { state: { token: response.data.token } });
         } catch (error) {
+            console.log(error);
             setMsg(error.response?.data.message || "Signup failed");
         } finally {
             setLoading(false); // ✅ Hide loader when request ends

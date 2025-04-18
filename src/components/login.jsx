@@ -62,7 +62,6 @@ const Login = () => {
                     <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         <TextField label="Email" name="email" type="email" variant="outlined" fullWidth required onChange={handleChange} />
                         <TextField label="Password" name="password" type="password" variant="outlined" fullWidth required onChange={handleChange} />
-
                         <Button
                             type="submit"
                             variant="contained"
@@ -85,6 +84,9 @@ const Login = () => {
                         New User?{" "}
                         <Link to="/signup" style={{ color: "#0284C7", textDecoration: "none", fontWeight: "bold" }}>
                             Signup Here
+                        </Link><br/>Forgot Password?
+                        <Link to="/forgot" style={{ color: "#0284C7", textDecoration: "none", fontWeight: "bold" }}>
+                            Click here
                         </Link>
                     </Typography>
 

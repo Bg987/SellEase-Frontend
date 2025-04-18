@@ -3,7 +3,7 @@ import { useEffect, } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API = axios.create({
-    baseURL: "https://sellease-backend.onrender.com", // Backend URL
+    baseURL: "http://192.168.121.47:5000", // Backend URL
     withCredentials: true
 });
 //"http://192.168.254.47:5000"
@@ -25,6 +25,7 @@ export const sell = (formData) => API.post("/sell/", formData, {
         "Content-Type": "multipart/form-data", // Let Axios handle FormData
     }
 });
+export const forgotPass = (email) =>API.post("auth/Forgot_Password", { email });//forgot password
 export const BuyItem = () =>
     API.get("/buy", {
         headers: {
@@ -79,5 +80,5 @@ export const getChatUsers = () =>
         },
     });
 export const SetName = (friendId, friendName) => API.post("api/chat/setName", { friendId, friendName });//save name
-export const GetName = (friendId) => API.post("api/chat/getName", { friendId});//get name
+export const GetName = (friendId) => API.post("api/chat/getName", { friendId });//get name
 export default API;

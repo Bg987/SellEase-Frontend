@@ -11,6 +11,7 @@ import History from "./components/history";
 import  Buy from "./components/buy";
 import  Chat from "./components/chatpage";
 import  Messages from "./components/messages";
+import  ForgotPassword from "./components/ForgotPassword";
 const App = () => {
     return (
 
@@ -29,6 +30,7 @@ const App = () => {
                 <Route path="/buy" element={<Buy />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/messages" element={<Messages />} />
+                <Route path="/forgot" element={<ForgotPassword />} />               
             </Routes>
         </Router>
     );

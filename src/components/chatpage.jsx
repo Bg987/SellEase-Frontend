@@ -13,7 +13,7 @@ dayjs.extend(relativeTime);
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 
-const socket = io("https://sellease-backend.onrender.com", { transports: ["websocket", "polling"] });
+const socket = io("http://192.168.121.47:5000", { transports: ["websocket", "polling"] });
 
 const ChatPage = () => {
     const location = useLocation();
