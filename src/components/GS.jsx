@@ -26,6 +26,8 @@ export const GlobalStateProvider = ({ children }) => {
     localStorage.setItem("login",false);
     localStorage.removeItem("Uname");
     localStorage.removeItem("City");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("login");
   };
   return (
     <GlobalStateContext.Provider value={{ isLoggedIn, dologin, dologout }}>
