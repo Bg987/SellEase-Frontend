@@ -86,7 +86,7 @@ const SellEaseLanding = () => {
 
       {/* Footer */}
       <AppBar position="static" color="secondary" sx={{ mt: 5, py: 2, textAlign: "center" }}>
-        <Typography variant="body1">&copy; 2025 SellEase. All rights reserved.</Typography>
+        <Typography variant="body1">&copy; 2025 SellEase By BG</Typography>
       </AppBar>
     </>
   );
