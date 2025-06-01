@@ -3,10 +3,10 @@ import { useEffect, } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API = axios.create({
-    baseURL: "https://sellease-backend.onrender.com", // Backend URL
+    baseURL: "http://192.168.45.47:5000", // Backend URL
     withCredentials: true
 });
-//"http://192.168.121.47:5000"
+//"http://192.168.45.47:5000"
 //https://sellease-backend.onrender.com
 export const signup = (userData) => API.post("/auth/signup", userData);
 
