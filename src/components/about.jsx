@@ -50,16 +50,6 @@ const AboutPage = () => {
         </Typography>
         <Grid container spacing={4} justifyContent="center" sx={{ marginTop: 2 }}>
           <Grid item xs={12} sm={6} md={4}>
-            <Card sx={{ boxShadow: 3 }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: '#3f51b5' }}>
-                  Trusted Platform
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#555' }}>
-                  With user verification, reviews, and secure payment options, we prioritize safety and trust in every transaction.
-                </Typography>
-              </CardContent>
-            </Card>
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <Card sx={{ boxShadow: 3 }}>
