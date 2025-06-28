@@ -12,7 +12,7 @@ const Signup = () => {
         city: "",
     });
     const [msg, setMsg] = useState("");
-    const [loading, setLoading] = useState(false); // ✅ Loading state
+    const [loading, setLoading] = useState(false); //  Loading state
 
     const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ const Signup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // ✅ Show loader when request starts
+        setLoading(true); //  Show loader when request starts
         setMsg(""); // Clear previous messages
 
         try {
@@ -32,7 +32,7 @@ const Signup = () => {
             console.log(error);
             setMsg(error.response?.data.message || "Signup failed");
         } finally {
-            setLoading(false); // ✅ Hide loader when request ends
+            setLoading(false); //  Hide loader when request ends
         }
     };
 
