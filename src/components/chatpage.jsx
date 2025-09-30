@@ -224,43 +224,44 @@ const ChatPage = () => {
             </Box>
 
             {/* AI Suggestions Box */}
-            {/* AI Suggestions Box */}
-{(suggestions.length > 0 || isLoadingSuggestions) && (
-    <Box
-        sx={{
-            position: "fixed",
-            bottom: { xs: "80px", sm: "70px" }, // space above input bar
-            left: 0,
-            right: 0,
-            display: "flex",
-            overflowX: "auto", // horizontal scroll for small screens
-            flexWrap: "nowrap",
-            gap: 1,
-            padding: "8px",
-            backgroundColor: "#fff",
-            zIndex: 1200,
-            boxShadow: "0px -2px 8px rgba(0,0,0,0.1)"
-        }}
-    >
-        {isLoadingSuggestions ? (
-            <Typography variant="caption" sx={{ whiteSpace: "nowrap" }}>
-                Generating smart replies...
-            </Typography>
-        ) : (
-            suggestions.map((s, idx) => (
-                <Button
-                    key={idx}
-                    variant="outlined"
-                    size="small"
-                    onClick={() => handleSuggestionClick(s)}
-                    sx={{ whiteSpace: "nowrap", flexShrink: 0 }}
+            {(suggestions.length > 0 || isLoadingSuggestions) && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        bottom: { xs: "80px", sm: "70px" },
+                        left: 0,
+                        right: 0,
+                        display: "flex",
+                        overflowX: "auto",
+                        flexWrap: "nowrap",
+                        gap: 1,
+                        padding: "8px",
+                        backgroundColor: "rgba(255, 255, 255, 0.7)", // semi-transparent white
+                        zIndex: 1200,
+                        boxShadow: "0px -2px 8px rgba(0,0,0,0.1)",
+                        backdropFilter: "blur(5px)", // optional: adds blur effect for transparency
+                    }}
                 >
-                    {s}
-                </Button>
-            ))
-        )}
-    </Box>
-)}
+                    {isLoadingSuggestions ? (
+                        <Typography variant="caption" sx={{ whiteSpace: "nowrap", color: "#000" }}>
+                            Generating smart replies...
+                        </Typography>
+                    ) : (
+                        suggestions.map((s, idx) => (
+                            <Button
+                                key={idx}
+                                variant="outlined"
+                                size="small"
+                                onClick={() => handleSuggestionClick(s)}
+                                sx={{ whiteSpace: "nowrap", flexShrink: 0, color: "#000", borderColor: "#000" }}
+                            >
+                                {s}
+                            </Button>
+                        ))
+                    )}
+                </Box>
+            )}
+
 
 
             {/* Input Bar */}
