@@ -224,17 +224,44 @@ const ChatPage = () => {
             </Box>
 
             {/* AI Suggestions Box */}
-            {(suggestions.length > 0 || isLoadingSuggestions) && (
-                <Box sx={{ position: "fixed", bottom: "70px", left: 0, right: 0, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 1, padding: "8px", backgroundColor: "#fff", zIndex: 1200, boxShadow: "0px -2px 8px rgba(0,0,0,0.1)" }}>
-                    {isLoadingSuggestions ? (
-                        <Typography variant="caption">Generating smart replies...</Typography>
-                    ) : (
-                        suggestions.map((s, idx) => (
-                            <Button key={idx} variant="outlined" size="small" onClick={() => handleSuggestionClick(s)}>{s}</Button>
-                        ))
-                    )}
-                </Box>
-            )}
+            {/* AI Suggestions Box */}
+{(suggestions.length > 0 || isLoadingSuggestions) && (
+    <Box
+        sx={{
+            position: "fixed",
+            bottom: { xs: "80px", sm: "70px" }, // space above input bar
+            left: 0,
+            right: 0,
+            display: "flex",
+            overflowX: "auto", // horizontal scroll for small screens
+            flexWrap: "nowrap",
+            gap: 1,
+            padding: "8px",
+            backgroundColor: "#fff",
+            zIndex: 1200,
+            boxShadow: "0px -2px 8px rgba(0,0,0,0.1)"
+        }}
+    >
+        {isLoadingSuggestions ? (
+            <Typography variant="caption" sx={{ whiteSpace: "nowrap" }}>
+                Generating smart replies...
+            </Typography>
+        ) : (
+            suggestions.map((s, idx) => (
+                <Button
+                    key={idx}
+                    variant="outlined"
+                    size="small"
+                    onClick={() => handleSuggestionClick(s)}
+                    sx={{ whiteSpace: "nowrap", flexShrink: 0 }}
+                >
+                    {s}
+                </Button>
+            ))
+        )}
+    </Box>
+)}
+
 
             {/* Input Bar */}
             <Box sx={{ position: "fixed", bottom: 0, left: 0, right: 0, display: "flex", gap: 1, padding: "12px", backgroundColor: "white", borderTop: "1px solid #ccc" }}>
