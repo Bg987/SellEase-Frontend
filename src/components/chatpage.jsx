@@ -18,7 +18,7 @@ dayjs.extend(relativeTime);
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 
-const socket = io("https://sellease-backend.onrender.com", { transports: ["websocket", "polling"] });
+const socket = io("https://sellease-backend-pwzt.onrender.com", { transports: ["websocket", "polling"] });
 
 const ChatPage = () => {
     const location = useLocation();
@@ -59,6 +59,7 @@ const ChatPage = () => {
     useEffect(() => {
         if (!sellerId) return;
         socket.emit("join", senderId);
+
         const markMessagesAsSeen = async () => {
             try {
                 await chatSeen(sellerId);
@@ -73,12 +74,10 @@ const ChatPage = () => {
                 const allMessages = res.data;
                 setMessages(allMessages);
 
+                // Trigger suggestion only if last message is incoming
                 const lastMsg = allMessages[allMessages.length - 1];
-
-                // ✅ Trigger suggestion only if the last message is from the other user (i.e., to the current user)
                 if (lastMsg && lastMsg.receiverId === senderId && lastMsg.senderId === sellerId) {
-                     setIsLoadingSuggestions(true);
-                    console.log("Last message is for user → triggering suggestion");
+                    setIsLoadingSuggestions(true);
                     socket.emit("requestSuggestions", {
                         senderId,
                         receiverId: sellerId
@@ -89,7 +88,6 @@ const ChatPage = () => {
                 console.error("Error fetching messages", err);
             }
         };
-
 
         markMessagesAsSeen();
         fetchMessages();
@@ -102,19 +100,24 @@ const ChatPage = () => {
                 setMessages(prev => [...prev, newMessage]);
                 markMessagesAsSeen();
 
-                // ✅ Only show suggestions if message is incoming (from seller)
+                // Only show suggestions if message is incoming
                 if (newMessage.senderId === sellerId) {
                     setIsLoadingSuggestions(true);
+                    socket.emit("requestSuggestions", {
+                        senderId,
+                        receiverId: sellerId
+                    });
                 } else {
                     setSuggestions([]);
                 }
             }
         });
 
-        socket.on("aiSuggestions", (suggestions) => {
-            setSuggestions(suggestions);
+        socket.on("aiSuggestions", (sugs) => {
+            setSuggestions(sugs);
             setIsLoadingSuggestions(false);
         });
+
         return () => {
             socket.off("receiveMessage");
             socket.off("aiSuggestions");
@@ -127,24 +130,24 @@ const ChatPage = () => {
         }
     }, [messages]);
 
-    const sendMessage = (customText) => {
-        const finalMsg = customText ?? message;
-        if (!finalMsg.trim()) return;
+    const sendMessage = () => {
+        if (!message.trim()) return;
 
         const newMsg = {
             senderId,
             receiverId: sellerId,
-            message: finalMsg,
+            message: message.trim(),
             timestamp: new Date().toISOString(),
         };
         setMessages(prev => [...prev, newMsg]);
         socket.emit("sendMessage", newMsg);
         setMessage("");
-        setSuggestions([]); // clear suggestions on send
+        setSuggestions([]);
     };
 
     const handleSuggestionClick = (text) => {
-        sendMessage(text);
+        setMessage(text); // Show suggestion in input for editing
+        setSuggestions([]); // Clear suggestion buttons after click
     };
 
     const formatDate = (timestamp) => {
@@ -183,7 +186,15 @@ const ChatPage = () => {
                     <Button variant="contained" startIcon={<ArrowBack />} onClick={() => navigate("/buy")}>Buy</Button>
                     <Button variant="contained" startIcon={<ArrowBack />} onClick={() => navigate("/messages")}>Messages</Button>
                     {isEditingName ? (
-                        <TextField value={customSellerName} onChange={(e) => setCustomSellerName(e.target.value)} onBlur={saveSellerName} onKeyDown={(e) => e.key === "Enter" && saveSellerName()} size="small" autoFocus sx={{ maxWidth: 200 }} />
+                        <TextField
+                            value={customSellerName}
+                            onChange={(e) => setCustomSellerName(e.target.value)}
+                            onBlur={saveSellerName}
+                            onKeyDown={(e) => e.key === "Enter" && saveSellerName()}
+                            size="small"
+                            autoFocus
+                            sx={{ maxWidth: 200 }}
+                        />
                     ) : (
                         <Typography variant="h6">Chat with {customSellerName}</Typography>
                     )}
@@ -234,7 +245,7 @@ const ChatPage = () => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                 />
-                <Button variant="contained" onClick={() => sendMessage()} sx={{ minWidth: 100 }}>
+                <Button variant="contained" onClick={sendMessage} sx={{ minWidth: 100 }}>
                     Send
                 </Button>
             </Box>
