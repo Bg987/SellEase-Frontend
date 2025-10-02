@@ -27,7 +27,7 @@ const Signup = () => {
 
         try {
             const response = await signup(formData);
-            navigate("/verify-otp", { state: { token: response.data.token } });
+            navigate("/verify-otp", { state: { sesId: response.data.sessionId } });
         } catch (error) {
             console.log(error);
             setMsg(error.response?.data.message || "Signup failed");

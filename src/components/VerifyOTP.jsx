@@ -8,11 +8,11 @@ const VerifyOTP = () => {
     const location = useLocation();
     const navigate = useNavigate();
     
-    const token = location.state?.token;
+    const TempId = location.state?.sesId;
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await verifyOTP({ token, otp }); // Call API
+            const response = await verifyOTP({ TempId, otp }); // Call API
             alert(response.data.message); // Show success message
             navigate("/login");
         } catch (error) {
