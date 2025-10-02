@@ -18,7 +18,7 @@ dayjs.extend(relativeTime);
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 
-const socket = io("https://sellease-backend-pwzt.onrender.com", { transports: ["websocket", "polling"] });
+const socket = io("https://sellease-backend.onrender.com", { transports: ["websocket", "polling"] });
 
 const ChatPage = () => {
     const location = useLocation();
