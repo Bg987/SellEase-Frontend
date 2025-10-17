@@ -67,7 +67,7 @@ const SellEaseLanding = () => {
           fontWeight: "bold",
         }}
       >
-        ⚙️ Note: Our backend is hosted on a free instance — it may take a few
+        ⚙️ Note: The backend is hosted on a free instance — it may take a few
         seconds to wake up when accessed for the first time. Thank you for your
         patience!
       </Alert>
