@@ -3,7 +3,7 @@ import { useEffect, } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API = axios.create({
-    baseURL: "https://sellease-backend.onrender.com", // Backend URL//chatpage too
+    baseURL: "http://localhost:5000", // Backend URL//chatpage too
     withCredentials: true
 });
 
